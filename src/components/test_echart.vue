@@ -2,17 +2,21 @@
   <div class="test_template">
     <div id="cha"></div>
     <div id="cha2" ref="cha2"></div>
+    <el-button @click="pauseFn" type="primary">{{pause}}</el-button>
   </div>
 </template>
 
 
 <script>
 import * as echarts from "echarts";
+import moment from 'moment';
 export default {
   name: "test_template",
   components: {},
   data() {
     return {
+      interval2: null,
+      pause: "Play",
       income: [320, 302, 341, 374, 390, 450, 420],
       expenses: [-120, -132, -101, -134, -190, -230, -210],
       option: {
@@ -186,22 +190,42 @@ export default {
     this.echartsInstance2.setOption(optionTmp2);
 
 // for every 2 seconds, update the data with random value
-    setInterval(() => {
-      this.income = this.income.map((item) => Math.ceil(Math.random()*100));
-      this.expenses = this.expenses.map((item) => 0 - Math.ceil(Math.random()*100));
-    }, 2000);
+    // this.interval2 = setInterval(() => {
+    //   this.income = this.income.map((item) => Math.ceil(Math.random()*100));
+    //   this.expenses = this.expenses.map((item) => 0 - Math.ceil(Math.random()*100));
+    // }, 2000);
 
   },
-  methods: {},
+  methods: {
+    pauseFn() {
+      if (this.interval2 !== null) {
+        clearInterval(this.interval2);
+        this.interval2 = null;
+        this.pause = 'Play';
+      }
+      else {
+        this.interval2 = setInterval(() => {
+          this.income = this.income.map((item) => Math.ceil(Math.random()*100));
+          this.expenses = this.expenses.map((item) => 0 - Math.ceil(Math.random()*100));
+        }, 2000);
+        this.pause = 'Pause';
+      
+    }
+    }
+  },
 watch: {
     income: function (val) {
       let optionTmp2 = this.option2;
       optionTmp2.series[0].data = val;
+      optionTmp2.yAxis[0].data.shift();
+      optionTmp2.yAxis[0].data.push(moment(new Date(1500035474800+Math.random()*899999999+100000000)).format('l'))
       this.echartsInstance2.setOption(optionTmp2);
     },
     expenses: function (val) {
       let optionTmp2 = this.option2;
       optionTmp2.series[1].data = val;
+      optionTmp2.yAxis[0].data.shift();
+      optionTmp2.yAxis[0].data.push(moment(new Date(1500035474800+Math.random()*899999999+100000000)).format('l'))
       this.echartsInstance2.setOption(optionTmp2);
     },
 }
