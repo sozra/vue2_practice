@@ -8,19 +8,25 @@
     "build": "vue-cli-service build"
   },
   "dependencies": {
+    "@vue/babel-helper-vue-jsx-merge-props": "^1.4.0",
+    "@vue/babel-preset-jsx": "^1.4.0",
+    "@vueuse/core": "^5.3.0",
     "axios": "^1.2.2",
     "core-js": "^2.6.5",
     "echarts": "^5.4.1",
     "element-ui": "^2.15.12",
+    "html2canvas": "^1.4.1",
+    "jspdf": "^2.5.1",
     "moment": "^2.29.4",
-    "vue": "^2.6.10",
+    "print-js": "^1.6.0",
+    "vue": "^2.7.14",
     "vue-router": "^3.6.5"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "^3.8.0",
     "@vue/cli-service": "^3.8.0",
     "tailwindcss": "^3.2.4",
-    "vue-template-compiler": "^2.6.10"
+    "vue-template-compiler": "^2.7.14"
   },
   "devServer": {
     "allowedHosts": "all"
