@@ -21,7 +21,7 @@
 
 <script>
 export default {
-  name: "element",
+  name: "element2",
   data() {
     return {
       tableData: [

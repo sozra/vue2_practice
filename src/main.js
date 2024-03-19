@@ -15,6 +15,7 @@ Vue.use(VueRouter);
 
 const routes = [
   { path: '', component: () => import('./components/vueuse.vue') },
+  { path: '/eleButton', component: () => import('./components/eleButton.vue') },
   { path: '/jsx2', component: () => import('./components/jsx2.jsx') },
   { path: '/jsx', component: () => import('./components/jsx.jsx') },
   { path: '/testJSX', component: () => import('./components/testJSX.vue') },
