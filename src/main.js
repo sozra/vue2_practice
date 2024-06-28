@@ -3,14 +3,14 @@ import App from './App.vue'
 import ElementUI from 'element-ui';
 import 'element-ui/lib/theme-chalk/index.css'
 // import './assets/components.css'
-import VueRouter from 'vue-router';
+// import VueRouter from 'vue-router';
 // import reactInput from './components/test_Reactive_Input.vue'
 // import wmsWorkOrderSendMaterials from './components/H093/wmsWorkOrderSendMaterials.vue'
-
+import router from './router'
 
 Vue.config.productionTip = false
 Vue.use(ElementUI);
-Vue.use(VueRouter);
+// Vue.use(VueRouter);
 
 
 const routes = [
@@ -61,10 +61,10 @@ const routes = [
   
 ]
 
-const router = new VueRouter({
-  mode: 'history',
-  routes // (缩写) 相当于 routes: routes
-})
+// const router = new VueRouter({
+//   mode: 'history',
+//   routes // (缩写) 相当于 routes: routes
+// })
 
 
 new Vue({
