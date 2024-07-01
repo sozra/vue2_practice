@@ -28,4 +28,18 @@ const router = new VueRouter({
   routes
 })
 
+router.beforeEach((to, from, next) => {
+  // 获取目标路由的标题
+  const title = to.meta.title;
+  
+  if (title) {
+    document.title = title;
+  } else {
+    // 如果没有设置标题，可以使用默认标题或路由名称
+    document.title = to.name || '默认标题';
+  }
+  
+  next();
+});
+
 export default router
