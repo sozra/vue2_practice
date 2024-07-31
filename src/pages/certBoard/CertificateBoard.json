@@ -1,0 +1,271 @@
+{
+    "DATA": [
+        {
+            "regularCount": 6,
+            "employeeList": [
+                {
+                    "workNo": "3270962",
+                    "grade": "1",
+                    "productRate": 0.21,
+                    "workName": "邓汉梅",
+                    "productCount": 149
+                },
+                {
+                    "workNo": "5137835",
+                    "grade": "1",
+                    "productRate": 0.07,
+                    "workName": "沈雪岸",
+                    "productCount": 52
+                },
+                {
+                    "workNo": "2389114",
+                    "grade": "1",
+                    "productRate": 0.02,
+                    "workName": "朱月丽",
+                    "productCount": 17
+                },
+                {
+                    "workNo": "5764876",
+                    "grade": "1",
+                    "productRate": 0.18,
+                    "workName": "谢林英",
+                    "productCount": 130
+                },
+                {
+                    "workNo": "6118258",
+                    "grade": "1",
+                    "productRate": 0.26,
+                    "workName": "王琼",
+                    "productCount": 189
+                },
+                {
+                    "workNo": "7091287",
+                    "grade": "1",
+                    "productRate": 0.25,
+                    "workName": "蒋戚",
+                    "productCount": 178
+                }
+            ],
+            "processName": "KBM520-MOPP",
+            "practiceCount": 0
+        },
+        {
+            "regularCount": 4,
+            "employeeList": [
+                {
+                    "workNo": "2389114",
+                    "grade": "1",
+                    "productRate": 0.04,
+                    "workName": "朱月丽",
+                    "productCount": 10
+                },
+                {
+                    "workNo": "5137835",
+                    "grade": "1",
+                    "productRate": 0.21,
+                    "workName": "沈雪岸",
+                    "productCount": 48
+                },
+                {
+                    "workNo": "5764876",
+                    "grade": "1",
+                    "productRate": 0.06,
+                    "workName": "谢林英",
+                    "productCount": 13
+                },
+                {
+                    "workNo": "2467519",
+                    "grade": "1",
+                    "productRate": 0.69,
+                    "workName": "陈龙",
+                    "productCount": 155
+                }
+            ],
+            "processName": "KB520-MOPP",
+            "practiceCount": 0
+        },
+        {
+            "regularCount": 2,
+            "employeeList": [
+                {
+                    "workNo": "4269968",
+                    "grade": "1",
+                    "productRate": 0.99,
+                    "workName": "钟安",
+                    "productCount": 348
+                },
+                {
+                    "workNo": "4078340",
+                    "grade": "1",
+                    "productRate": 0.01,
+                    "workName": "杨东霞",
+                    "productCount": 2
+                }
+            ],
+            "processName": "KB050-E85FILM",
+            "practiceCount": 0
+        },
+        {
+            "regularCount": 1,
+            "employeeList": [
+                {
+                    "workNo": "7088622",
+                    "grade": "1",
+                    "productRate": 1,
+                    "workName": "林观永",
+                    "productCount": 2
+                }
+            ],
+            "processName": "KB240-STIFASSY",
+            "practiceCount": 0
+        },
+        {
+            "regularCount": 2,
+            "employeeList": [
+                {
+                    "workNo": "2769874",
+                    "grade": "1",
+                    "productRate": 0.69,
+                    "workName": "付灵敏",
+                    "productCount": 127
+                },
+                {
+                    "workNo": "4263811",
+                    "grade": "1",
+                    "productRate": 0.31,
+                    "workName": "李治",
+                    "productCount": 57
+                }
+            ],
+            "processName": "KB480-COS4-1",
+            "practiceCount": 0
+        },
+        {
+            "regularCount": 3,
+            "employeeList": [
+                {
+                    "workNo": "4277917",
+                    "grade": "1",
+                    "productRate": 0.63,
+                    "workName": "占晴雨",
+                    "productCount": 133
+                },
+                {
+                    "workNo": "4201032",
+                    "grade": "1",
+                    "productRate": 0.28,
+                    "workName": "闵方菊",
+                    "productCount": 60
+                },
+                {
+                    "workNo": "7523980",
+                    "grade": "1",
+                    "productRate": 0.09,
+                    "workName": "黄祖红",
+                    "productCount": 18
+                }
+            ],
+            "processName": "KBM390-COS3",
+            "practiceCount": 0
+        },
+        {
+            "regularCount": 1,
+            "employeeList": [
+                {
+                    "workNo": "2769874",
+                    "grade": "1",
+                    "productRate": 1,
+                    "workName": "付灵敏",
+                    "productCount": 189
+                }
+            ],
+            "processName": "KB500-COS4-3",
+            "practiceCount": 0
+        },
+        {
+            "regularCount": 1,
+            "employeeList": [
+                {
+                    "workNo": "3524948",
+                    "grade": "1",
+                    "productRate": 1,
+                    "workName": "年金桃",
+                    "productCount": 175
+                }
+            ],
+            "processName": "KB490-COS4-2",
+            "practiceCount": 0
+        },
+        {
+            "regularCount": 1,
+            "employeeList": [
+                {
+                    "workNo": "3167768",
+                    "grade": "1",
+                    "productRate": 1,
+                    "workName": "张得胜",
+                    "productCount": 4
+                }
+            ],
+            "processName": "KBM392-ACOUSTIC",
+            "practiceCount": 0
+        },
+        {
+            "regularCount": 1,
+            "employeeList": [
+                {
+                    "workNo": "6170279",
+                    "grade": "1",
+                    "productRate": 1,
+                    "workName": "刘庭祥",
+                    "productCount": 151
+                }
+            ],
+            "processName": "KB510-COS4",
+            "practiceCount": 0
+        },
+        {
+            "regularCount": 3,
+            "employeeList": [
+                {
+                    "workNo": "2758154",
+                    "grade": "1",
+                    "productRate": 0.17,
+                    "workName": "杜支平",
+                    "productCount": 54
+                },
+                {
+                    "workNo": "7523980",
+                    "grade": "1",
+                    "productRate": 0.06,
+                    "workName": "黄祖红",
+                    "productCount": 18
+                },
+                {
+                    "workNo": "4266499",
+                    "grade": "1",
+                    "productRate": 0.78,
+                    "workName": "郑寒英",
+                    "productCount": 249
+                }
+            ],
+            "processName": "KB390-COS3",
+            "practiceCount": 0
+        },
+        {
+            "regularCount": 1,
+            "employeeList": [
+                {
+                    "workNo": "4187174",
+                    "grade": "1",
+                    "productRate": 1,
+                    "workName": "刘丽梅",
+                    "productCount": 244
+                }
+            ],
+            "processName": "KB020-KMBASSY",
+            "practiceCount": 0
+        }
+    ],
+    "RESULT": "PASS"
+}
