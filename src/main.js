@@ -8,8 +8,11 @@ import 'element-ui/lib/theme-chalk/index.css'
 // import wmsWorkOrderSendMaterials from './components/H093/wmsWorkOrderSendMaterials.vue'
 import router from './router'
 
+// import testPlugins from './testPlugins'
+
 Vue.config.productionTip = false
 Vue.use(ElementUI);
+// Vue.use(testPlugins);
 // Vue.use(VueRouter);
 
 
