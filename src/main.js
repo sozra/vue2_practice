@@ -2,6 +2,9 @@ import Vue from 'vue'
 import App from './App.vue'
 import ElementUI from 'element-ui';
 import 'element-ui/lib/theme-chalk/index.css'
+import VueFullscreen from 'vue-fullscreen'
+// import Vue from 'vue'
+Vue.use(VueFullscreen)
 // import './assets/components.css'
 // import VueRouter from 'vue-router';
 // import reactInput from './components/test_Reactive_Input.vue'
@@ -35,9 +38,9 @@ const routes = [
   { path: '/testpdf', component: () => import('@/components/testPdf.vue') },
   { path: '/tableCellMerge', component: () => import('@/components/tableCellMerge.vue') },
   { path: '/query', component: () => import('@/components/query.vue') },
-  { path: '/progressGroup', component: () => import('@/components/progressGroup.vue') },
-  { path: '/progress', component: () => import('@/components/progress.vue') },
-  { path: '/testProgress', component: () => import('@/components/testProgress.vue') },
+  // { path: '/progressGroup', component: () => import('@/components/progressGroup.vue') },
+  // { path: '/progress', component: () => import('@/components/progress.vue') },
+  // { path: '/testProgress', component: () => import('@/components/testProgress.vue') },
   { path: '/reactInput', component: () => import('@/components/test_Reactive_Input.vue') },
   { path: '/echart', component: () => import('@/components/test_echart.vue') },
   { path: '/wmsWorkOrderSendMaterials', component: () => import('@/components/H093/wmsWorkOrderSendMaterials.vue') },

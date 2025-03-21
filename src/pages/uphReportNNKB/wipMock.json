@@ -1,0 +1,117 @@
+{
+    "DATA": [
+        {
+            "shoporder": "2024102001",
+            "shoporderQty": 1000,
+            "inputQty": 12,
+            "withoutQty": 988,
+            "wip": 8
+        },
+        {
+            "shoporder": "2024102002",
+            "shoporderQty": 1000,
+            "inputQty": 12,
+            "withoutQty": 988,
+            "wip": 8
+        },
+        {
+            "shoporder": "TEST-ZX-02",
+            "shoporderQty": 100,
+            "inputQty": 10,
+            "withoutQty": 90,
+            "wip": 7
+        },
+        {
+            "shoporder": "PA-TEST-BOX240915",
+            "shoporderQty": 100,
+            "inputQty": 38,
+            "withoutQty": 62,
+            "wip": 6
+        },
+        {
+            "shoporder": "TEST-ZX-04",
+            "shoporderQty": 100,
+            "inputQty": 2,
+            "withoutQty": 98,
+            "wip": 1
+        },
+        {
+            "shoporder": "2024102001",
+            "shoporderQty": 1000,
+            "inputQty": 12,
+            "withoutQty": 988,
+            "wip": 8
+        },
+        {
+            "shoporder": "2024102002",
+            "shoporderQty": 1000,
+            "inputQty": 12,
+            "withoutQty": 988,
+            "wip": 8
+        },
+        {
+            "shoporder": "TEST-ZX-02",
+            "shoporderQty": 100,
+            "inputQty": 10,
+            "withoutQty": 90,
+            "wip": 7
+        },
+        {
+            "shoporder": "PA-TEST-BOX240915",
+            "shoporderQty": 100,
+            "inputQty": 38,
+            "withoutQty": 62,
+            "wip": 6
+        },
+        {
+            "shoporder": "TEST-ZX-04",
+            "shoporderQty": 100,
+            "inputQty": 2,
+            "withoutQty": 98,
+            "wip": 1
+        },
+        {
+            "shoporder": "2024102001",
+            "shoporderQty": 1000,
+            "inputQty": 12,
+            "withoutQty": 988,
+            "wip": 8
+        },
+        {
+            "shoporder": "2024102002",
+            "shoporderQty": 1000,
+            "inputQty": 12,
+            "withoutQty": 988,
+            "wip": 8
+        },
+        {
+            "shoporder": "TEST-ZX-02",
+            "shoporderQty": 100,
+            "inputQty": 10,
+            "withoutQty": 90,
+            "wip": 7
+        },
+        {
+            "shoporder": "PA-TEST-BOX240915",
+            "shoporderQty": 100,
+            "inputQty": 38,
+            "withoutQty": 62,
+            "wip": 6
+        },
+        {
+            "shoporder": "TEST-ZX-04",
+            "shoporderQty": 100,
+            "inputQty": 2,
+            "withoutQty": 98,
+            "wip": 1
+        },
+        {
+            "shoporder": "TEST-ZX-03",
+            "shoporderQty": 100,
+            "inputQty": 2,
+            "withoutQty": 98,
+            "wip": 1
+        }
+    ],
+    "RESULT": "PASS"
+}
