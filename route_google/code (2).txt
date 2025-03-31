@@ -1,0 +1,335 @@
+<template>
+  <div class="process-route-list-container">
+    <!-- 操作按钮区域 -->
+    <div class="actions-bar">
+      <el-button type="primary" icon="el-icon-plus" @click="handleNew">新工艺路线</el-button>
+      <el-button type="warning" icon="el-icon-check" @click="handleValidate" :loading="validating">工艺路线校验</el-button>
+    </div>
+
+    <!-- 查询表单区域 -->
+    <el-card class="search-card">
+      <el-form :inline="true" :model="searchParams" ref="searchForm" class="search-form">
+        <el-form-item label="项目名称" prop="projectName">
+          <el-input v-model="searchParams.projectName" placeholder="请输入项目名称" clearable></el-input>
+        </el-form-item>
+        <el-form-item label="产品料号" prop="productCode">
+          <el-input v-model="searchParams.productCode" placeholder="请输入产品料号" clearable></el-input>
+        </el-form-item>
+        <el-form-item label="路线名称" prop="routeName">
+          <el-input v-model="searchParams.routeName" placeholder="请输入路线名称" clearable></el-input>
+        </el-form-item>
+         <el-form-item label="状态" prop="status">
+           <el-select v-model="searchParams.status" placeholder="请选择状态" clearable>
+               <el-option label="设计中" value="设计中"></el-option>
+               <el-option label="已完成" value="已完成"></el-option>
+               <el-option label="已取消" value="已取消"></el-option>
+               <!-- 更多状态 -->
+           </el-select>
+        </el-form-item>
+        <!-- 其他查询条件... -->
+        <el-form-item>
+          <el-button type="primary" icon="el-icon-search" @click="handleSearch">搜 索</el-button>
+          <el-button icon="el-icon-refresh" @click="handleReset">重 置</el-button>
+        </el-form-item>
+      </el-form>
+    </el-card>
+
+    <!-- 数据表格区域 -->
+    <el-card class="table-card">
+      <el-table
+        v-loading="loading"
+        :data="tableData"
+        style="width: 100%"
+        border
+      >
+        <el-table-column prop="id" label="ID" width="80" align="center"></el-table-column>
+        <el-table-column prop="projectName" label="项目名称" width="150"></el-table-column>
+        <el-table-column prop="productCode" label="产品（定制料号）" width="180"></el-table-column>
+        <el-table-column prop="section" label="工段" width="100"></el-table-column>
+        <el-table-column prop="routeName" label="工艺路线名称" width="180"></el-table-column>
+        <el-table-column prop="prevRoute" label="上一工艺路线" width="150"></el-table-column>
+        <el-table-column prop="line" label="线体" width="100"></el-table-column>
+        <el-table-column prop="type" label="类型" width="100" align="center"></el-table-column>
+        <el-table-column prop="status" label="状态" width="100" align="center">
+            <template slot-scope="scope">
+                <el-tag :type="getStatusTagType(scope.row.status)">{{ scope.row.status }}</el-tag>
+            </template>
+        </el-table-column>
+        <el-table-column prop="modifier" label="修改人" width="120"></el-table-column>
+        <el-table-column prop="modifyTime" label="修改时间" width="180"></el-table-column>
+        <el-table-column label="操作" width="320" fixed="right" align="center">
+          <template slot-scope="scope">
+            <el-button
+              size="mini"
+              type="primary"
+              icon="el-icon-edit"
+              @click="handleEdit(scope.row)"
+              :disabled="scope.row.status !== '设计中'"
+            >编辑</el-button>
+             <el-button
+              size="mini"
+              type="danger"
+              icon="el-icon-delete"
+              @click="handleDelete(scope.row)"
+              :disabled="scope.row.status !== '设计中'"
+            >删除</el-button>
+             <el-button
+              size="mini"
+              type="info"
+              icon="el-icon-view"
+              @click="handleViewStations(scope.row)"
+            >查看工站</el-button>
+             <el-button
+              size="mini"
+              type="warning"
+              @click="handleCancelDesign(scope.row)"
+               v-if="scope.row.status === '设计中'"
+            >取消</el-button>
+             <el-button
+              size="mini"
+              type="success"
+              @click="handleCompleteDesign(scope.row)"
+              v-if="scope.row.status === '设计中'"
+            >完成设计</el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+
+       <!-- 分页 (如果需要) -->
+       <!-- <el-pagination ... /> -->
+    </el-card>
+
+    <!-- 新增/编辑弹窗 -->
+    <process-route-form-dialog
+      :visible.sync="dialogVisible"
+      :mode="dialogMode"
+      :initial-data="currentRowData"
+      @success="handleDialogSuccess"
+    />
+
+  </div>
+</template>
+
+<script>
+import {
+    getProcessRoutes,
+    deleteProcessRoute,
+    validateProcessRoute,
+    cancelProcessRouteDesign,
+    completeProcessRouteDesign
+} from '@/api/processRoute';
+import ProcessRouteFormDialog from '@/components/ProcessRouteFormDialog.vue';
+
+// 默认搜索参数
+const defaultSearchParams = {
+  projectName: '',
+  productCode: '',
+  routeName: '',
+  status: ''
+};
+
+export default {
+  name: 'ProcessRouteList',
+  components: {
+    ProcessRouteFormDialog,
+  },
+  data() {
+    return {
+      searchParams: { ...defaultSearchParams },
+      tableData: [],
+      loading: false,
+      validating: false, // 用于校验按钮loading
+      // 弹窗相关
+      dialogVisible: false,
+      dialogMode: 'new', // 'new' or 'edit'
+      currentRowData: null, // 存储当前操作行的数据，用于编辑
+    };
+  },
+  created() {
+    this.fetchData(); // 页面加载时获取数据
+  },
+  methods: {
+    // 获取表格数据
+    fetchData() {
+      this.loading = true;
+      getProcessRoutes(this.searchParams)
+        .then(response => {
+          if (response.code === 200 && response.data) {
+            // this.tableData = response.data.list || [];
+             // --- 使用模拟数据 ---
+            this.tableData = response.data.list.filter(item => {
+                let match = true;
+                if (this.searchParams.projectName && !item.projectName.includes(this.searchParams.projectName)) match = false;
+                if (this.searchParams.productCode && !item.productCode.includes(this.searchParams.productCode)) match = false;
+                if (this.searchParams.routeName && !item.routeName.includes(this.searchParams.routeName)) match = false;
+                 if (this.searchParams.status && item.status !== this.searchParams.status) match = false;
+                return match;
+            });
+             // --- /使用模拟数据 ---
+          } else {
+             this.$message.error(response.msg || '数据加载失败');
+             this.tableData = []; // 清空数据
+          }
+        })
+        .catch(error => {
+          console.error('Failed to fetch process routes:', error);
+          this.$message.error('网络错误或服务器异常');
+          this.tableData = []; // 清空数据
+        })
+        .finally(() => {
+          this.loading = false;
+        });
+    },
+    // 搜索
+    handleSearch() {
+      this.fetchData();
+    },
+    // 重置搜索表单
+    handleReset() {
+      this.searchParams = { ...defaultSearchParams };
+       // 如果用了el-form的ref
+      // this.$refs.searchForm.resetFields();
+      this.fetchData();
+    },
+    // 新增按钮点击
+    handleNew() {
+      this.dialogMode = 'new';
+      this.currentRowData = null; // 清空当前行数据
+      this.dialogVisible = true;
+    },
+    // 编辑按钮点击
+    handleEdit(row) {
+      this.dialogMode = 'edit';
+      this.currentRowData = row; // 传递当前行数据给弹窗
+      this.dialogVisible = true;
+    },
+    // 删除按钮点击
+    handleDelete(row) {
+       this.$confirm(`确定要删除工艺路线 "${row.routeName}" 吗？`, '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning',
+        }).then(() => {
+          this.loading = true; // 可以加个表格loading效果
+          deleteProcessRoute(row.id).then(response => {
+              if (response.code === 200) {
+                   this.$message.success('删除成功');
+                   this.fetchData(); // 刷新列表
+              } else {
+                   this.$message.error(response.msg || '删除失败');
+              }
+          }).catch(error => {
+              console.error('Delete failed:', error);
+              this.$message.error('删除操作失败');
+          }).finally(() => {
+              this.loading = false;
+          });
+      }).catch(() => {
+          // 用户点击取消，不做处理
+           this.$message.info('已取消删除');
+      });
+    },
+    // 查看工站按钮点击
+    handleViewStations(row) {
+      // 跳转到工站页面，并携带工艺路线ID和名称（可选）
+      this.$router.push({
+        name: 'ProcessStationList', // 使用路由名称
+        params: {
+            routeId: row.id,
+            routeName: row.routeName // 传递名称，方便在工站页面显示
+        },
+      });
+    },
+    // 取消设计
+    handleCancelDesign(row) {
+        this.$confirm(`确定要取消 "${row.routeName}" 的设计吗？状态将变为“已取消”。`, '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning',
+        }).then(() => {
+             this.loading = true;
+             cancelProcessRouteDesign(row.id).then(res => {
+                 if(res.code === 200) {
+                     this.$message.success('取消设计成功');
+                     this.fetchData(); // 刷新数据
+                 } else {
+                     this.$message.error(res.msg || '操作失败');
+                 }
+             }).catch(err => this.$message.error('操作失败')).finally(() => this.loading = false);
+        }).catch(() => { this.$message.info('已取消操作'); });
+    },
+    // 完成设计
+    handleCompleteDesign(row) {
+         this.$confirm(`确定要完成 "${row.routeName}" 的设计吗？状态将变为“已完成”。`, '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'success', // 或者 info
+        }).then(() => {
+             this.loading = true;
+             completeProcessRouteDesign(row.id).then(res => {
+                 if(res.code === 200) {
+                     this.$message.success('完成设计成功');
+                     this.fetchData(); // 刷新数据
+                 } else {
+                     this.$message.error(res.msg || '操作失败');
+                 }
+             }).catch(err => this.$message.error('操作失败')).finally(() => this.loading = false);
+        }).catch(() => { this.$message.info('已取消操作'); });
+    },
+    // 工艺路线校验按钮点击
+    handleValidate() {
+        this.validating = true;
+        validateProcessRoute().then(response => {
+            if (response.code === 200) {
+                this.$message.success(response.msg || '校验通过');
+            } else {
+                this.$message.warning(response.msg || '校验存在问题'); // 使用 warning 或 error
+            }
+        }).catch(error => {
+            console.error('Validation failed:', error);
+            this.$message.error('校验请求失败');
+        }).finally(() => {
+            this.validating = false;
+        });
+    },
+    // 弹窗成功回调（新增或编辑成功后）
+    handleDialogSuccess(payload) {
+      // payload 包含 { mode: 'new'/'edit', data: ... }
+      console.log('Dialog success payload:', payload);
+      this.fetchData(); // 刷新表格数据
+      // 这里可以根据 payload.mode 和 payload.data 做一些额外的处理，如果需要的话
+    },
+    // 根据状态返回标签类型
+    getStatusTagType(status) {
+        switch (status) {
+            case '设计中': return 'warning';
+            case '已完成': return 'success';
+            case '已取消': return 'info';
+            default: return 'primary';
+        }
+    }
+  },
+};
+</script>
+
+<style scoped>
+.process-route-list-container {
+  padding: 20px;
+}
+.actions-bar {
+  margin-bottom: 15px;
+}
+.search-card {
+  margin-bottom: 15px;
+}
+.search-form .el-form-item {
+  margin-bottom: 0; /* 减少 Card 内表单项的下边距 */
+}
+.table-card {
+    margin-top: 15px;
+}
+/* 可以根据需要调整按钮间距 */
+.el-table .el-button + .el-button {
+    margin-left: 5px;
+}
+</style>

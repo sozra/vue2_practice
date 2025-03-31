@@ -1,0 +1,463 @@
+<template>
+  <div class="process-station-list-container">
+    <h2>工站列表 - {{ currentRouteName }} (ID: {{ routeId }})</h2>
+
+    <!-- 顶部操作按钮 -->
+    <div class="actions-bar">
+      <el-button type="default" icon="el-icon-back" @click="handleReturn">返回工艺路线</el-button>
+      <el-button type="success" icon="el-icon-check" @click="handleSave" :loading="saveLoading">保 存</el-button>
+      <el-button type="primary" icon="el-icon-download" @click="handleImportStations" :disabled="!routeId">模块导入工站</el-button>
+      <el-button type="primary" icon="el-icon-document-copy" @click="handleShowCopyStationDialog" :disabled="!routeId">复制工站</el-button>
+      <el-button type="primary" icon="el-icon-plus" @click="handleNewStation">新工站</el-button>
+      <el-button type="warning" icon="el-icon-copy-document" @click="handleCopyRoute" :disabled="!routeId">复制工艺路线</el-button>
+       <el-button type="warning" icon="el-icon-files" @click="handleBatchCopyRoute" :disabled="!routeId">批量复制工艺路线</el-button>
+      <!-- 其他按钮 -->
+    </div>
+
+    <!-- 数据表格 -->
+    <el-card class="table-card">
+        <el-table
+            :data="tableData"
+            v-loading="loading"
+            style="width: 100%"
+            border
+            row-key="stationId"
+            ref="stationTable"
+        >
+            <!-- 可编辑列 -->
+            <el-table-column prop="stationId" label="工站ID" width="100" align="center"></el-table-column>
+
+            <el-table-column label="工站名称" width="180">
+                <template slot-scope="scope">
+                    <el-select v-model="scope.row.stationName" placeholder="选择或输入名称" filterable allow-create clearable>
+                         <el-option v-for="item in stationNameOptions" :key="item.value" :label="item.label" :value="item.label"></el-option>
+                         <!-- allow-create 允许输入新名称 -->
+                    </el-select>
+                </template>
+            </el-table-column>
+
+             <el-table-column label="工站" width="150">
+                <template slot-scope="scope">
+                    <el-select v-model="scope.row.stationCode" placeholder="选择工站" filterable clearable>
+                        <el-option v-for="item in stationCodeOptions" :key="item.value" :label="item.label" :value="item.value"></el-option>
+                    </el-select>
+                </template>
+            </el-table-column>
+
+             <el-table-column label="工站类型" width="120">
+                <template slot-scope="scope">
+                    <el-select v-model="scope.row.stationType" placeholder="选择类型" clearable>
+                        <el-option v-for="item in stationTypeOptions" :key="item.value" :label="item.label" :value="item.value"></el-option>
+                    </el-select>
+                </template>
+            </el-table-column>
+
+             <el-table-column label="维修投入点" width="120" align="center">
+                <template slot-scope="scope">
+                    <el-select v-model="scope.row.repairPoint" placeholder="选择" clearable>
+                         <el-option label="是" value="是"></el-option>
+                         <el-option label="否" value="否"></el-option>
+                    </el-select>
+                </template>
+            </el-table-column>
+
+            <el-table-column label="不良发现点" width="120" align="center">
+                <template slot-scope="scope">
+                    <el-select v-model="scope.row.defectPoint" placeholder="选择" clearable>
+                        <el-option label="是" value="是"></el-option>
+                        <el-option label="否" value="否"></el-option>
+                    </el-select>
+                </template>
+            </el-table-column>
+
+            <!-- 上一节点/下一节点等，通常需要基于当前列表中的其他工站ID来选择 -->
+             <el-table-column label="上一节点" width="150">
+                <template slot-scope="scope">
+                     <el-select v-model="scope.row.prevNode" placeholder="选择上一节点" filterable clearable>
+                         <el-option
+                            v-for="item in getNodeOptions(scope.row.stationId)"
+                            :key="item.value"
+                            :label="item.label"
+                            :value="item.value"
+                        ></el-option>
+                    </el-select>
+                </template>
+            </el-table-column>
+             <el-table-column label="下一节点" width="150">
+                <template slot-scope="scope">
+                     <el-select v-model="scope.row.nextNode" placeholder="选择下一节点" filterable clearable>
+                         <el-option
+                            v-for="item in getNodeOptions(scope.row.stationId)"
+                            :key="item.value"
+                            :label="item.label"
+                            :value="item.value"
+                        ></el-option>
+                    </el-select>
+                </template>
+            </el-table-column>
+             <el-table-column label="下一节点（抽检）" width="180">
+                 <template slot-scope="scope">
+                     <el-select v-model="scope.row.nextNodeCheck" placeholder="选择抽检节点" filterable clearable>
+                          <el-option
+                            v-for="item in getNodeOptions(scope.row.stationId)"
+                            :key="item.value"
+                            :label="item.label"
+                            :value="item.value"
+                        ></el-option>
+                    </el-select>
+                </template>
+             </el-table-column>
+             <el-table-column label="下一节点（FAIL）" width="180">
+                 <template slot-scope="scope">
+                     <el-select v-model="scope.row.nextNodeFail" placeholder="选择Fail节点" filterable clearable>
+                          <el-option
+                            v-for="item in getNodeOptions(scope.row.stationId)"
+                            :key="item.value"
+                            :label="item.label"
+                            :value="item.value"
+                        ></el-option>
+                         <!-- 也可能需要包含维修站等特殊选项 -->
+                    </el-select>
+                </template>
+             </el-table-column>
+
+            <el-table-column label="排序号" width="100">
+                <template slot-scope="scope">
+                    <el-input-number v-model="scope.row.sortOrder" :min="1" size="mini" controls-position="right"></el-input-number>
+                </template>
+            </el-table-column>
+
+            <!-- 只读列 -->
+            <el-table-column prop="creator" label="创建人" width="120"></el-table-column>
+            <el-table-column prop="modifier" label="修改人" width="120"></el-table-column>
+
+            <!-- 操作列 -->
+            <el-table-column label="操作" width="100" fixed="right" align="center">
+                <template slot-scope="scope">
+                    <!-- 编辑是行内编辑，这里主要是删除 -->
+                    <el-button
+                        size="mini"
+                        type="danger"
+                        icon="el-icon-delete"
+                        @click="handleDeleteStation(scope.$index, scope.row)"
+                    >删除</el-button>
+                    <!-- 如果需要独立的行“修改”按钮（例如触发弹窗），可以加在这里 -->
+                </template>
+            </el-table-column>
+        </el-table>
+    </el-card>
+
+    <!-- 复制工站弹窗 -->
+    <copy-station-dialog
+        :visible.sync="copyStationDialogVisible"
+        :current-route-info="{ id: routeId, name: currentRouteName }"
+        @success="handleCopyStationSuccess"
+    />
+
+  </div>
+</template>
+
+<script>
+import {
+    getStationsByRouteId,
+    saveStations,
+    deleteStation,
+    getStationOptions, // 获取工站代码选项
+    getStationTypeOptions, // 获取工站类型选项
+    importStationsFromModule, // 模拟API
+    copyCompleteProcessRoute, // 模拟API
+    batchCopyProcessRoute // 模拟API
+} from '@/api/processStation';
+import CopyStationDialog from '@/components/CopyStationDialog.vue';
+
+// 默认新工站行结构
+const defaultNewStation = {
+    stationId: null, // 后端生成或保存时处理
+    stationName: '',
+    stationCode: '',
+    stationType: '',
+    repairPoint: '否',
+    defectPoint: '否',
+    prevNode: null,
+    nextNode: null,
+    nextNodeCheck: null,
+    nextNodeFail: null,
+    sortOrder: 1, // 初始排序号
+    // creator 和 modifier 由后端处理或根据登录用户设置
+    isNew: true // 标记为新行，方便处理
+};
+
+export default {
+  name: 'ProcessStationList',
+  components: {
+      CopyStationDialog
+  },
+  props: {
+    // 从路由参数自动注入
+    routeId: {
+      type: [String, Number],
+      required: true,
+    },
+    routeName: { // 可选，从路由参数注入
+        type: String,
+        default: ''
+    }
+  },
+  data() {
+    return {
+      currentRouteName: this.routeName || '加载中...', // 初始显示
+      tableData: [], // 表格数据
+      loading: false, // 表格加载状态
+      saveLoading: false, // 保存按钮加载状态
+      copyStationDialogVisible: false, // 复制工站弹窗显隐
+
+      // 下拉框选项
+      stationNameOptions: [], // 工站名称建议选项 (如果需要)
+      stationCodeOptions: [], // 工站代码选项
+      stationTypeOptions: [], // 工站类型选项
+      // 节点选项是动态生成的，见 computed/methods
+    };
+  },
+  computed: {
+      // 为节点选择器提供选项（排除自身）
+      nodeOptions() {
+          return this.tableData.map(item => ({
+              value: item.stationId, // 或 stationCode，取决于节点字段存的是什么
+              label: `${item.stationName} (${item.stationId || item.stationCode})`
+          }));
+      }
+  },
+  created() {
+      if (!this.routeName && this.routeId) {
+          // 如果路由没有传递名称，可以尝试根据 ID 再次获取（或在上一页保证传递）
+          console.warn("Route name not passed via params, display might be incomplete initially.");
+      }
+      this.fetchStations();
+      this.fetchDropdownOptions(); // 获取下拉框数据
+  },
+  methods: {
+    // 获取工站数据
+    fetchStations() {
+      if (!this.routeId) return;
+      this.loading = true;
+      getStationsByRouteId(this.routeId)
+        .then(response => {
+          if (response.code === 200 && Array.isArray(response.data)) {
+            // 给获取的数据添加一个唯一标识符用于行内编辑和操作，如果后端没提供 stationId
+            // 最好后端直接提供唯一ID
+            this.tableData = response.data.map((item, index) => ({
+                ...item,
+                // 确保有唯一 key，如果 stationId 可能为 null 或重复（在新行时）
+                _rowKey: item.stationId || `new_${Date.now()}_${index}`
+            }));
+          } else {
+              this.$message.error(response.msg || '加载工站数据失败');
+              this.tableData = [];
+          }
+        })
+        .catch(error => {
+          console.error('Failed to fetch stations:', error);
+          this.$message.error('网络错误或服务器异常');
+           this.tableData = [];
+        })
+        .finally(() => {
+          this.loading = false;
+        });
+    },
+    // 获取所有下拉框选项
+    async fetchDropdownOptions() {
+        try {
+            const [stations, types] = await Promise.all([
+                getStationOptions(), // 获取工站代码/名称选项
+                getStationTypeOptions() // 获取工站类型选项
+            ]);
+            this.stationCodeOptions = stations.data || [];
+            this.stationNameOptions = stations.data || []; // 可以共用或分开获取
+            this.stationTypeOptions = types.data || [];
+            // 其他选项...
+        } catch (error) {
+            console.error("Failed to fetch dropdown options:", error);
+            this.$message.error("获取下拉选项失败");
+        }
+    },
+    // 动态生成节点选项，排除当前行
+    getNodeOptions(currentStationId) {
+        return this.nodeOptions.filter(option => option.value !== currentStationId);
+    },
+    // 返回工艺路线列表
+    handleReturn() {
+      this.$router.go(-1); // 返回上一页
+      // 或者 this.$router.push({ name: 'ProcessRouteList' });
+    },
+    // 保存所有更改
+    handleSave() {
+      // TODO: 添加必要的校验逻辑，例如检查是否有重复的排序号等
+
+      this.$confirm('确定要保存对所有工站的修改吗？', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+      }).then(() => {
+            this.saveLoading = true;
+            // API 可能需要整个 tableData 列表
+            saveStations(this.routeId, this.tableData)
+                .then(response => {
+                    if (response.code === 200) {
+                        this.$message.success('保存成功');
+                        this.fetchStations(); // 重新加载数据，可能包含后端生成的新ID等
+                    } else {
+                        this.$message.error(response.msg || '保存失败');
+                    }
+                })
+                .catch(error => {
+                    console.error('Save failed:', error);
+                    this.$message.error('保存操作失败');
+                })
+                .finally(() => {
+                    this.saveLoading = false;
+                });
+        }).catch(() => {
+            this.$message.info('已取消保存');
+        });
+    },
+    // 模块导入工站
+    handleImportStations() {
+        // 这里通常会打开一个弹窗或抽屉，让用户选择模块
+        this.$prompt('请输入要导入的模块ID', '模块导入', {
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            // inputPattern: /.../, // 可以加校验
+            // inputErrorMessage: '...'
+        }).then(({ value: moduleId }) => {
+            if (moduleId) {
+                this.loading = true; // 导入可能耗时，加loading
+                importStationsFromModule(this.routeId, moduleId).then(res => {
+                     if(res.code === 200) {
+                        this.$message.success('导入成功');
+                        this.fetchStations(); // 刷新列表
+                    } else {
+                        this.$message.error(res.msg || '导入失败');
+                    }
+                }).catch(err => this.$message.error('导入操作失败')).finally(() => this.loading = false);
+            }
+        }).catch(() => {
+            this.$message.info('已取消导入');
+        });
+    },
+    // 显示复制工站弹窗
+    handleShowCopyStationDialog() {
+        this.copyStationDialogVisible = true;
+    },
+    // 复制工站成功后的回调
+    handleCopyStationSuccess() {
+        // 复制成功后通常需要刷新当前工站列表
+        this.fetchStations();
+    },
+    // 新增一行工站
+    handleNewStation() {
+        const maxSortOrder = this.tableData.length > 0 ? Math.max(...this.tableData.map(item => item.sortOrder || 0)) : 0;
+        const newStation = {
+            ...defaultNewStation,
+            _rowKey: `new_${Date.now()}`, // 临时唯一key
+            sortOrder: maxSortOrder + 1,
+            // 设置默认的创建人等信息（如果需要前端处理）
+            // creator: this.$store.getters.userName // 假设从 Vuex 获取
+        };
+       this.tableData.push(newStation);
+       // 滚动到表格底部（如果需要）
+       this.$nextTick(() => {
+           this.$refs.stationTable?.bodyWrapper.scrollTop = this.$refs.stationTable.bodyWrapper.scrollHeight;
+       });
+    },
+     // 复制当前工艺路线
+    handleCopyRoute() {
+         this.$prompt('请输入新工艺路线的名称', '复制工艺路线', {
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            inputValue: `${this.currentRouteName}_复制`, // 默认新名称
+            inputValidator: (value) => { return value && value.trim() ? true : '名称不能为空'; }
+        }).then(({ value: newRouteName }) => {
+             this.loading = true;
+             copyCompleteProcessRoute(this.routeId, newRouteName.trim()).then(res => {
+                 if(res.code === 200) {
+                    // 复制成功后，可以选择跳转到新路线，或者提示用户，或者刷新路线列表（如果还在当前页）
+                    this.$message.success(`工艺路线已复制为 "${newRouteName}"`);
+                    // 可能需要一个全局事件或Vuex action来通知列表页刷新
+                 } else {
+                     this.$message.error(res.msg || '复制失败');
+                 }
+             }).catch(err => this.$message.error('复制操作失败')).finally(() => this.loading = false);
+        }).catch(() => {
+            this.$message.info('已取消复制');
+        });
+    },
+    // 批量复制工艺路线
+    handleBatchCopyRoute() {
+        // 这个功能通常更复杂，需要选择目标工艺路线
+        // 这里仅作示意，实际可能需要一个更复杂的弹窗组件
+         this.$message.info('批量复制功能待实现，通常需要选择目标路线。');
+         // 示例API调用
+         // const targetRouteIds = [/* ... selected target route IDs ... */];
+         // batchCopyProcessRoute(this.routeId, targetRouteIds).then(...)
+    },
+    // 删除一行工站
+    handleDeleteStation(index, row) {
+       this.$confirm(`确定要删除工站 "${row.stationName || '新工站'}" 吗？`, '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning',
+        }).then(() => {
+            // 如果是新添加的行 (isNew 标志或 stationId 为 null)，直接从 tableData 移除
+            if (row.isNew || !row.stationId) {
+                this.tableData.splice(index, 1);
+                this.$message.success('已移除新增行');
+            } else {
+                // 如果是已存在的行，调用 API 删除
+                this.loading = true; // 也可以只 loading 这一行
+                 deleteStation(this.routeId, row.stationId).then(response => {
+                    if (response.code === 200) {
+                        this.$message.success('删除成功');
+                        // 从 tableData 中移除，避免刷新整个列表导致编辑状态丢失
+                        this.tableData.splice(index, 1);
+                        // 或者调用 this.fetchStations() 刷新整个列表
+                    } else {
+                         this.$message.error(response.msg || '删除失败');
+                    }
+                }).catch(error => {
+                    console.error('Delete station failed:', error);
+                    this.$message.error('删除操作失败');
+                }).finally(() => {
+                     this.loading = false;
+                });
+            }
+      }).catch(() => {
+          this.$message.info('已取消删除');
+      });
+    }
+  }
+};
+</script>
+
+<style scoped>
+.process-station-list-container {
+  padding: 20px;
+}
+.actions-bar {
+  margin-bottom: 15px;
+}
+.table-card {
+    margin-top: 15px;
+}
+/* 行内编辑时下拉框宽度可能需要调整 */
+.el-table .el-select {
+    width: 100%;
+}
+.el-table .el-input-number {
+    width: 100%;
+}
+h2 {
+    margin-bottom: 15px;
+    font-size: 1.5em;
+    color: #333;
+}
+</style>

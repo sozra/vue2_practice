@@ -1,0 +1,169 @@
+<template>
+  <el-dialog
+    :title="dialogTitle"
+    :visible.sync="dialogVisible"
+    width="600px"
+    :before-close="handleClose"
+    @open="handleOpen"
+    append-to-body
+    :close-on-click-modal="false"
+  >
+    <el-form ref="form" :model="formData" :rules="rules" label-width="120px">
+      <el-form-item label="项目名称" prop="projectName">
+        <el-input v-model="formData.projectName" placeholder="请输入项目名称"></el-input>
+      </el-form-item>
+      <el-form-item label="产品（定制料号）" prop="productCode">
+        <el-input v-model="formData.productCode" placeholder="请输入产品料号"></el-input>
+      </el-form-item>
+      <el-form-item label="工段" prop="section">
+        <el-input v-model="formData.section" placeholder="请输入工段"></el-input>
+      </el-form-item>
+      <el-form-item label="工艺路线名称" prop="routeName">
+        <el-input v-model="formData.routeName" placeholder="请输入工艺路线名称"></el-input>
+      </el-form-item>
+      <el-form-item label="上一工艺路线" prop="prevRoute">
+        <el-input v-model="formData.prevRoute" placeholder="请输入上一工艺路线"></el-input>
+      </el-form-item>
+       <el-form-item label="线体" prop="line">
+        <el-input v-model="formData.line" placeholder="请输入线体"></el-input>
+      </el-form-item>
+      <el-form-item label="类型" prop="type">
+         <el-select v-model="formData.type" placeholder="请选择类型">
+             <el-option label="标准" value="标准"></el-option>
+             <el-option label="返工" value="返工"></el-option>
+             <!-- 可以根据实际情况增加更多选项 -->
+         </el-select>
+      </el-form-item>
+      <!-- 其他需要的字段 -->
+    </el-form>
+    <span slot="footer" class="dialog-footer">
+      <el-button @click="handleClose">取 消</el-button>
+      <el-button type="primary" @click="handleSubmit" :loading="loading">确 定</el-button>
+    </span>
+  </el-dialog>
+</template>
+
+<script>
+import { createProcessRoute, updateProcessRoute } from '@/api/processRoute';
+
+// 默认空表单结构，用于重置
+const defaultForm = {
+  id: null,
+  projectName: '',
+  productCode: '',
+  section: '',
+  routeName: '',
+  prevRoute: '',
+  line: '',
+  type: '标准', // 默认值
+  status: '设计中' // 新增时默认为设计中
+};
+
+export default {
+  name: 'ProcessRouteFormDialog',
+  props: {
+    // 控制显隐，使用 .sync 修饰符
+    visible: {
+      type: Boolean,
+      default: false,
+    },
+    // 模式： 'new' 或 'edit'
+    mode: {
+      type: String,
+      default: 'new', // or 'edit'
+    },
+    // 编辑时传入的初始数据
+    initialData: {
+      type: Object,
+      default: () => ({}),
+    },
+  },
+  data() {
+    return {
+      formData: { ...defaultForm },
+      loading: false,
+      rules: { // 简单校验示例
+        projectName: [{ required: true, message: '请输入项目名称', trigger: 'blur' }],
+        productCode: [{ required: true, message: '请输入产品料号', trigger: 'blur' }],
+        routeName: [{ required: true, message: '请输入工艺路线名称', trigger: 'blur' }],
+        type: [{ required: true, message: '请选择类型', trigger: 'change' }],
+      },
+    };
+  },
+  computed: {
+    dialogVisible: {
+      get() {
+        return this.visible;
+      },
+      set(val) {
+        // 通过 input 事件更新父组件的 visible 状态
+        this.$emit('update:visible', val);
+      },
+    },
+    dialogTitle() {
+      return this.mode === 'new' ? '新增工艺路线' : '编辑工艺路线';
+    },
+  },
+  methods: {
+    // 弹窗打开时的回调
+    handleOpen() {
+       this.loading = false;
+      // 清除之前的校验状态
+      this.$nextTick(() => {
+        this.$refs.form?.clearValidate();
+      });
+      if (this.mode === 'edit' && this.initialData && this.initialData.id) {
+        // 编辑模式：深拷贝一份初始数据，避免直接修改 props
+        this.formData = JSON.parse(JSON.stringify(this.initialData));
+      } else {
+        // 新增模式：重置表单为默认值
+         this.formData = { ...defaultForm };
+      }
+    },
+    // 关闭弹窗前的回调
+    handleClose() {
+       if (this.loading) return; // 防止提交过程中关闭
+       this.dialogVisible = false; // 触发 update:visible
+    },
+    // 提交表单
+    handleSubmit() {
+      this.$refs.form.validate((valid) => {
+        if (valid) {
+          this.loading = true;
+          const apiCall = this.mode === 'new'
+            ? createProcessRoute(this.formData)
+            : updateProcessRoute(this.formData.id, this.formData);
+
+          apiCall.then(response => {
+            if (response.code === 200) {
+              this.$message.success(this.mode === 'new' ? '新增成功' : '更新成功');
+              // 触发 'success' 事件，通知父组件操作成功，可以刷新列表等
+              this.$emit('success', { mode: this.mode, data: response.data });
+              this.handleClose(); // 关闭弹窗
+            } else {
+              this.$message.error(response.msg || '操作失败');
+            }
+          }).catch(error => {
+            console.error('API call failed:', error);
+            this.$message.error('网络错误或服务器异常');
+          }).finally(() => {
+            this.loading = false;
+          });
+        } else {
+          console.log('表单校验失败!');
+          return false;
+        }
+      });
+    },
+  },
+};
+</script>
+
+<style scoped>
+.dialog-footer {
+  text-align: right;
+}
+.el-select {
+    width: 100%; /* 让下拉框宽度占满 */
+}
+</style>

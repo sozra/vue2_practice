@@ -1,0 +1,187 @@
+<template>
+  <el-dialog
+    title="复制工站"
+    :visible.sync="dialogVisible"
+    width="500px"
+    :before-close="handleClose"
+    @open="handleOpen"
+    append-to-body
+    :close-on-click-modal="false"
+  >
+    <el-form ref="form" :model="formData" :rules="rules" label-width="120px">
+      <el-form-item label="项目" prop="project">
+        <el-select v-model="formData.project" placeholder="请选择项目" filterable @change="handleProjectChange">
+          <el-option v-for="item in projectOptions" :key="item.value" :label="item.label" :value="item.value"></el-option>
+        </el-select>
+      </el-form-item>
+      <el-form-item label="产品（定制料号）" prop="productCode">
+        <el-select v-model="formData.productCode" placeholder="请选择产品料号" filterable :loading="productLoading" :disabled="!formData.project" @change="handleProductChange">
+           <el-option v-for="item in productOptions" :key="item.value" :label="item.label" :value="item.value"></el-option>
+        </el-select>
+      </el-form-item>
+      <el-form-item label="旧工艺路线" prop="oldRouteName">
+        <el-select v-model="formData.oldRouteName" placeholder="请选择旧工艺路线" filterable :loading="routeLoading" :disabled="!formData.productCode">
+           <el-option v-for="item in oldRouteOptions" :key="item.value" :label="item.label" :value="item.value"></el-option>
+        </el-select>
+      </el-form-item>
+      <el-form-item label="新工艺路线">
+        <el-input :value="newRouteName" placeholder="当前工艺路线" readonly disabled></el-input>
+      </el-form-item>
+    </el-form>
+    <span slot="footer" class="dialog-footer">
+      <el-button @click="handleClose">取 消</el-button>
+      <el-button type="primary" @click="handleSubmit" :loading="submitLoading">确 定</el-button>
+    </span>
+  </el-dialog>
+</template>
+
+<script>
+import { copyStationFromRoute, getProjectOptions, getProductOptions, getOldRouteOptions } from '@/api/processStation';
+
+export default {
+  name: 'CopyStationDialog',
+  props: {
+    visible: {
+      type: Boolean,
+      default: false,
+    },
+    // 当前（新）工艺路线的信息，用于显示只读输入框
+    currentRouteInfo: {
+        type: Object,
+        default: () => ({ id: null, name: ''})
+    }
+  },
+  data() {
+    return {
+      formData: {
+        project: '',
+        productCode: '',
+        oldRouteName: '', // 或者 oldRouteId，取决于 API 需要什么
+      },
+      projectOptions: [],
+      productOptions: [],
+      oldRouteOptions: [],
+      productLoading: false,
+      routeLoading: false,
+      submitLoading: false,
+      rules: {
+        project: [{ required: true, message: '请选择项目', trigger: 'change' }],
+        productCode: [{ required: true, message: '请选择产品料号', trigger: 'change' }],
+        oldRouteName: [{ required: true, message: '请选择旧工艺路线', trigger: 'change' }],
+      },
+    };
+  },
+  computed: {
+    dialogVisible: {
+      get() {
+        return this.visible;
+      },
+      set(val) {
+        this.$emit('update:visible', val);
+      },
+    },
+    newRouteName() {
+        return this.currentRouteInfo?.name || '';
+    }
+  },
+  methods: {
+    async handleOpen() {
+       this.submitLoading = false;
+       this.resetForm();
+       this.$nextTick(() => {
+           this.$refs.form?.clearValidate();
+       });
+       await this.fetchProjects();
+    },
+    resetForm() {
+        this.formData = { project: '', productCode: '', oldRouteName: '' };
+        this.productOptions = [];
+        this.oldRouteOptions = [];
+    },
+    async fetchProjects() {
+        try {
+            const res = await getProjectOptions();
+            this.projectOptions = res.data || [];
+        } catch (error) {
+            this.$message.error('获取项目列表失败');
+            console.error(error);
+        }
+    },
+    async handleProjectChange(project) {
+        this.formData.productCode = ''; // 清空产品和路线
+        this.formData.oldRouteName = '';
+        this.productOptions = [];
+        this.oldRouteOptions = [];
+        if (!project) return;
+        this.productLoading = true;
+         try {
+            const res = await getProductOptions(project);
+            this.productOptions = res.data || [];
+        } catch (error) {
+             this.$message.error('获取产品列表失败');
+            console.error(error);
+        } finally {
+            this.productLoading = false;
+        }
+    },
+     async handleProductChange(product) {
+        this.formData.oldRouteName = ''; // 清空路线
+        this.oldRouteOptions = [];
+        if (!product || !this.formData.project) return;
+        this.routeLoading = true;
+         try {
+            const res = await getOldRouteOptions(this.formData.project, product);
+            this.oldRouteOptions = res.data || [];
+        } catch (error) {
+             this.$message.error('获取旧工艺路线列表失败');
+            console.error(error);
+        } finally {
+            this.routeLoading = false;
+        }
+    },
+    handleClose() {
+      if (this.submitLoading) return;
+      this.dialogVisible = false;
+    },
+    handleSubmit() {
+      this.$refs.form.validate((valid) => {
+        if (valid) {
+          this.submitLoading = true;
+          const payload = {
+            sourceProject: this.formData.project,
+            sourceProductCode: this.formData.productCode,
+            sourceRouteName: this.formData.oldRouteName, // 或者 ID
+            targetRouteId: this.currentRouteInfo.id // 需要传入目标工艺路线 ID
+          };
+          copyStationFromRoute(payload).then(response => {
+            if (response.code === 200) {
+                this.$message.success('复制工站成功');
+                this.$emit('success'); // 通知父组件成功
+                this.handleClose();
+            } else {
+                this.$message.error(response.msg || '复制失败');
+            }
+          }).catch(error => {
+            console.error("API call failed:", error);
+            this.$message.error('网络错误或服务器异常');
+          }).finally(() => {
+            this.submitLoading = false;
+          });
+        } else {
+          console.log('表单校验失败!');
+          return false;
+        }
+      });
+    },
+  },
+};
+</script>
+
+<style scoped>
+.el-select {
+    width: 100%;
+}
+.dialog-footer {
+  text-align: right;
+}
+</style>
