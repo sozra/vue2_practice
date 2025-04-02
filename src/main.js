@@ -9,7 +9,10 @@ Vue.use(VueFullscreen)
 // import VueRouter from 'vue-router';
 // import reactInput from './components/test_Reactive_Input.vue'
 // import wmsWorkOrderSendMaterials from './components/H093/wmsWorkOrderSendMaterials.vue'
-import router from './router'
+import router from './router/index'
+
+import _ from 'lodash-es';
+Vue.prototype._ = _; // 可选：挂载到 Vue 原型上方便使用
 
 // import testPlugins from './testPlugins'
 
