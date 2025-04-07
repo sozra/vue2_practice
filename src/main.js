@@ -16,10 +16,14 @@ Vue.prototype._ = _; // 可选：挂载到 Vue 原型上方便使用
 
 // import testPlugins from './testPlugins'
 
+import http from './api'
+
 Vue.config.productionTip = false
 Vue.use(ElementUI);
 // Vue.use(testPlugins);
 // Vue.use(VueRouter);
+Vue.prototype.$http = http;
+// Vue.prototype.$app = app;
 
 
 const routes = [

@@ -4,6 +4,9 @@ import VueRouter from 'vue-router';
 // 引入视图组件 (使用懒加载提高性能)
 const RouteManagement = () => import(/* webpackChunkName: "route-management" */ '@/views/RouteManagement/Index.vue');
 const StationManagement = () => import(/* webpackChunkName: "station-management" */ '@/views/StationManagement/Index.vue');
+// 新增工艺路线管理模块
+const Mes2RoutePage = () => import(/* webpackChunkName: "mes2-route" */ '@/views/mes2route/index.vue');
+const Mes2StationPage = () => import(/* webpackChunkName: "mes2-station" */ '@/views/mes2route/station.vue');
 
 Vue.use(VueRouter);
 
@@ -25,6 +28,20 @@ const routes = [
     component: StationManagement,
     props: true, // 将 route params (routeId) 作为 props 注入组件
     meta: { title: '工站管理' } // 动态标题可在组件内设置
+  },
+  // 新增工艺路线管理路由
+  {
+    path: '/mes2route',
+    name: 'Mes2RoutePage',
+    component: Mes2RoutePage,
+    meta: { title: '工艺路线管理' }
+  },
+  {
+    path: '/mes2route/:routeId/station',
+    name: 'Mes2StationPage',
+    component: Mes2StationPage,
+    props: true,
+    meta: { title: '工站工艺路线' }
   },
   // 可以添加 404 页面等
   // { path: '*', component: NotFoundComponent }

@@ -1,0 +1,75 @@
+{
+  "RESULT":"PASS",
+  "code": 0,
+  "message": "success",
+  "data": {
+    "total": 100,
+    "list": [
+      {
+        "id": "RL001",
+        "projectName": "手机后盖生产",
+        "productCode": "P20220001",
+        "section": "组装",
+        "routeName": "后盖组装标准流程",
+        "prevRouteName": "后盖组装预处理",
+        "productLine": "A线体",
+        "type": "标准",
+        "status": "已完成",
+        "modifiedBy": "张工",
+        "modifiedTime": "2023-05-15 12:30:45"
+      },
+      {
+        "id": "RL002",
+        "projectName": "电池组装",
+        "productCode": "P20220002",
+        "section": "电池",
+        "routeName": "电池组装标准流程",
+        "prevRouteName": "",
+        "productLine": "B线体",
+        "type": "标准",
+        "status": "设计中",
+        "modifiedBy": "李工",
+        "modifiedTime": "2023-05-16 14:20:33"
+      },
+      {
+        "id": "RL003",
+        "projectName": "屏幕组装",
+        "productCode": "P20220003",
+        "section": "组装",
+        "routeName": "屏幕组装标准流程",
+        "prevRouteName": "屏幕预处理",
+        "productLine": "C线体",
+        "type": "定制",
+        "status": "已完成",
+        "modifiedBy": "王工",
+        "modifiedTime": "2023-05-17 09:15:22"
+      },
+      {
+        "id": "RL004",
+        "projectName": "主板焊接",
+        "productCode": "P20220004",
+        "section": "焊接",
+        "routeName": "主板焊接标准流程",
+        "prevRouteName": "",
+        "productLine": "D线体",
+        "type": "标准",
+        "status": "审核中",
+        "modifiedBy": "赵工",
+        "modifiedTime": "2023-05-18 16:40:12"
+      },
+      {
+        "id": "RL005",
+        "projectName": "摄像头组装",
+        "productCode": "P20220005",
+        "section": "组装",
+        "routeName": "摄像头组装标准流程",
+        "prevRouteName": "摄像头清洁",
+        "productLine": "A线体",
+        "type": "定制",
+        "status": "设计中",
+        "modifiedBy": "钱工",
+        "modifiedTime": "2023-05-19 10:25:38"
+      }
+    ]
+  }
+} 

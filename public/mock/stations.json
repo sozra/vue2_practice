@@ -1,0 +1,85 @@
+{
+  "RESULT":"PASS",
+  "code": 0,
+  "message": "success",
+  "data": {
+    "total": 50,
+    "list": [
+      {
+        "id": "ST001",
+        "name": "后盖清洁",
+        "station": "GZ001",
+        "stationType": "组装",
+        "repairInput": true,
+        "defectPoint": true,
+        "prevNode": "待料区",
+        "nextNode": "后盖检测",
+        "nextNodeSample": "质检站",
+        "nextNodeFail": "返修区",
+        "order": 1,
+        "createdBy": "张工",
+        "modifiedBy": "李工"
+      },
+      {
+        "id": "ST002",
+        "name": "后盖检测",
+        "station": "GZ002",
+        "stationType": "检测",
+        "repairInput": false,
+        "defectPoint": true,
+        "prevNode": "后盖清洁",
+        "nextNode": "零件组装",
+        "nextNodeSample": "质检站",
+        "nextNodeFail": "返修区",
+        "order": 2,
+        "createdBy": "张工",
+        "modifiedBy": "李工"
+      },
+      {
+        "id": "ST003",
+        "name": "零件组装",
+        "station": "GZ003",
+        "stationType": "组装",
+        "repairInput": false,
+        "defectPoint": false,
+        "prevNode": "后盖检测",
+        "nextNode": "组装质检",
+        "nextNodeSample": "",
+        "nextNodeFail": "返修区",
+        "order": 3,
+        "createdBy": "王工",
+        "modifiedBy": "王工"
+      },
+      {
+        "id": "ST004",
+        "name": "组装质检",
+        "station": "GZ004",
+        "stationType": "质检",
+        "repairInput": false,
+        "defectPoint": true,
+        "prevNode": "零件组装",
+        "nextNode": "包装",
+        "nextNodeSample": "",
+        "nextNodeFail": "返修区",
+        "order": 4,
+        "createdBy": "赵工",
+        "modifiedBy": "钱工"
+      },
+      {
+        "id": "ST005",
+        "name": "包装",
+        "station": "GZ005",
+        "stationType": "包装",
+        "repairInput": false,
+        "defectPoint": false,
+        "prevNode": "组装质检",
+        "nextNode": "出货区",
+        "nextNodeSample": "",
+        "nextNodeFail": "",
+        "order": 5,
+        "createdBy": "钱工",
+        "modifiedBy": "钱工"
+      }
+    ]
+  }
+} 
