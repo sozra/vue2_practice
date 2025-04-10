@@ -25,7 +25,10 @@ const routes = importAll(require.context('./pages', true, /\.vue$/))
 const router = new VueRouter({
   mode: 'history',
   base: process.env.BASE_URL,
-  routes
+  routes: [
+    ...routes,
+    { path: '/devicestatus', component: () => import('@/pages/DeviceStatusDashboard/index.vue') }
+  ]
 })
 
 router.beforeEach((to, from, next) => {
